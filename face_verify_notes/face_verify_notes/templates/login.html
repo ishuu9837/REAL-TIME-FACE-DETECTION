@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="/static/css/login.css" />
+    <title>Login</title>
+  </head>
+  <body style="background-color: #f1eeff">
+    <header
+      class="d-flex flex-wrap align-items-center justify-content-between py-3 mb-4 border-bottom"
+      style="padding: 15px; background-color: #d7cdff"
+    >
+      <a
+        href="#"
+        class="d-flex align-items-center mb-2 mb-md-0 text-body-emphasis text-decoration-none"
+      >
+        <img
+          src="/static/images/clipart1474643.png"
+          alt="My Diary Logo"
+          style="width: 60px; height: 60px"
+        />
+      </a>
+      <div class="col-md-3 text-end">
+        <a href="/signuprender" class="btn btn-outline-primary me-2">Sign Up</a>
+        <a href="/" class="btn btn-primary">Back</a>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="login-container">
+        <form id="mainForm" method="post" enctype="multipart/form-data">
+          <h1 class="h3 mb-3 fw-normal text-center">Login</h1>
+
+          <div class="form-floating mb-3">
+            <input
+              type="email"
+              class="form-control"
+              id="floatingEmail"
+              name="email"
+              placeholder="name@example.com"
+              required
+            />
+            <label for="floatingEmail">Email address</label>
+          </div>
+
+          <div class="mb-3">
+            <select
+              class="form-select"
+              id="loginOption"
+              name="loginOption"
+              aria-label="Login Option"
+              style="height: 55px; margin-top: 30px; margin-bottom: 30px"
+              required
+            >
+              <option value="" disabled selected>Choose option</option>
+              <option value="password">Login with Password</option>
+              <option value="face">Login with Face</option>
+            </select>
+          </div>
+
+          <div id="passwordSection" style="display: none">
+            <div class="form-floating mb-3">
+              <input
+                type="password"
+                class="form-control"
+                id="floatingPassword"
+                name="password"
+                placeholder="Password"
+                required
+              />
+              <label for="floatingPassword">Password</label>
+            </div>
+          </div>
+
+          <button class="btn btn-primary w-100 py-2" type="submit">
+            Login
+          </button>
+          <p class="mt-3 mb-0 text-center text-muted">&copy; 2024 My Diary</p>
+        </form>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="faceLoginModal"
+      tabindex="-1"
+      aria-labelledby="faceLoginModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="faceLoginModalLabel">Face Login</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <button type="button" class="btn btn-primary" id="cameraButton">
+              Start Camera
+            </button>
+            <canvas id="cameraCanvas"></canvas>
+            <div id="additionalFaceLoginSection" style="display: none">
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="faceDetails"
+                  placeholder="Face Details"
+                />
+                <label for="faceDetails">Enter Face Details</label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const loginOption = document.getElementById("loginOption");
+        const passwordSection = document.getElementById("passwordSection");
+        const faceLoginModal = new bootstrap.Modal(
+          document.getElementById("faceLoginModal")
+        );
+        const cameraButton = document.getElementById("cameraButton");
+        const cameraCanvas = document.getElementById("cameraCanvas");
+        const mainForm = document.getElementById("mainForm");
+        let stream;
+        let intervalId;
+        let faceVerified = false;
+
+        loginOption.addEventListener("change", function () {
+          if (this.value === "password") {
+            passwordSection.style.display = "block";
+            faceLoginModal.hide();
+            stopFaceLogin();
+          } else if (this.value === "face") {
+            passwordSection.style.display = "none";
+            faceLoginModal.show();
+            startFaceLogin();
+          } else {
+            passwordSection.style.display = "none";
+            faceLoginModal.hide();
+            stopFaceLogin();
+          }
+        });
+
+        async function startFaceLogin() {
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            const video = document.createElement("video");
+            video.srcObject = stream;
+            video.play();
+
+            const ctx = cameraCanvas.getContext("2d");
+
+            function draw() {
+              if (stream && video.readyState === video.HAVE_ENOUGH_DATA) {
+                cameraCanvas.width = video.videoWidth;
+                cameraCanvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0);
+
+                const boxColor = faceVerified ? "green" : "yellow";
+                const boxText = faceVerified ? "Verified" : "Verifying...";
+
+                ctx.strokeStyle = boxColor;
+                ctx.lineWidth = 5;
+                ctx.strokeRect(
+                  50,
+                  50,
+                  cameraCanvas.width - 100,
+                  cameraCanvas.height - 100
+                );
+                ctx.font = "30px Arial";
+                ctx.fillStyle = boxColor;
+                ctx.fillText(boxText, 60, 40);
+              }
+              requestAnimationFrame(draw);
+            }
+
+            draw();
+            cameraCanvas.style.display = "block";
+
+            intervalId = setInterval(async () => {
+              const imageData = cameraCanvas.toDataURL("image/png");
+              const email = document.getElementById("floatingEmail").value;
+              console.log("Sending face data");
+
+              try {
+                const response = await fetch("/login", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    email: email,
+                    loginOption: "face",
+                    image: imageData,
+                  }),
+                });
+
+                const data = await response.json();
+                console.log("Response data:", data);
+
+                if (data.success) {
+                  faceVerified = true;
+                  clearInterval(intervalId);
+                  setTimeout(() => {
+                    window.location.href = "/main";
+                  }, 1000);
+                } else {
+                  faceVerified = false;
+                  console.log("Face recognition ongoing, no match found yet.");
+                }
+              } catch (error) {
+                console.error("Error during face recognition:", error);
+              }
+            }, 2000);
+          } catch (err) {
+            console.error("Error accessing the camera:", err);
+          }
+        }
+
+        function stopFaceLogin() {
+          if (stream) {
+            stream.getTracks().forEach((track) => track.stop());
+          }
+          if (intervalId) {
+            clearInterval(intervalId);
+          }
+          cameraCanvas.style.display = "none";
+        }
+
+        mainForm.addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          if (loginOption.value === "password") {
+            const email = document.getElementById("floatingEmail").value;
+            const password = document.getElementById("floatingPassword").value;
+
+            console.log("Submitting password login");
+
+            fetch("/login", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: email,
+                loginOption: "password",
+                password: password,
+              }),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.success) {
+                  window.location.href = "/main";
+                } else {
+                  alert(
+                    "Password login failed. Please check your credentials."
+                  );
+                }
+              })
+              .catch((error) => {
+                console.error("Error during password login:", error);
+              });
+          }
+        });
+
+        window.addEventListener("beforeunload", function () {
+          stopFaceLogin();
+        });
+
+        document
+          .querySelector("#faceLoginModal")
+          .addEventListener("hidden.bs.modal", function () {
+            stopFaceLogin();
+          });
+      });
+    </script>
+  </body>
+</html>

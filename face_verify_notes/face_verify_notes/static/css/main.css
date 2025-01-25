@@ -1,0 +1,74 @@
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    margin: 0;
+  }
+  .main-container {
+    flex: 1;
+    display: flex;
+  }
+  .sidebar {
+    width: 280px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  .content {
+    flex: 1;
+    padding: 20px;
+    text-align: center;
+  }
+  .hero-section {
+    padding: 40px;
+    background: linear-gradient(to right, #d7cdff, #b5a2ff);
+    border-radius: 8px;
+  }
+  .nav-link {
+    display: block;
+    padding: 10px;
+    margin-bottom: 5px;
+    color: #000;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    text-decoration: none;
+  }
+  .nav-link:hover,
+  .nav-link.active {
+    background-color: #adb5bd;
+    color: #fff;
+  }
+  .collapse-content {
+    background: linear-gradient(to right, #ddd6ff, #d6cbff);
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 5px;
+  }
+  .nav-item {
+    margin-bottom: 10px;
+  }
+  .collapse {
+    margin-top: 10px;
+  }
+  .header-username {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-left: 250px;
+    margin-right: 10px;
+  }
+  .specialnumber {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #007bff;
+  }
+  .task-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  .task-actions button {
+    font-size: 0.875rem;
+  }
+  .hidden {
+    display: none;
+  }

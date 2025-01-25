@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Sidebars</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="/static/css/main.css" />
+  </head>
+  <body style="background-color: #f1eeff">
+    <header
+      class="d-flex flex-wrap align-items-center justify-content-between py-3 mb-4 border-bottom"
+      style="padding: 10px; background-color: #d7cdff"
+    >
+      <a
+        href="#"
+        class="d-flex align-items-center mb-2 mb-md-0 text-body-emphasis text-decoration-none"
+      >
+        <img
+          src="/static/images/clipart1474643.png"
+          alt="My Diary Logo"
+          style="width: 60px; height: 60px"
+        />
+      </a>
+      <div class="col-md-3 d-flex align-items-center">
+        <span class="header-username">{{ user_email }}</span>
+      </div>
+      <div class="col-md-3 d-flex align-items-center text-end">
+        <button
+          type="button"
+          class="btn btn-primary me-2"
+          style="margin-left: auto"
+        >
+          <a href="/logout" style="text-decoration: none; color: white"
+            >Log Out</a
+          >
+        </button>
+      </div>
+    </header>
+
+    <div class="main-container">
+      <div class="sidebar">
+        <a
+          href="#collapseTimeSpent"
+          class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none"
+        >
+          <span class="fs-4">Dashboard</span>
+        </a>
+        <hr />
+        <ul class="nav nav-pills flex-column mb-auto">
+          <li class="nav-item">
+            <a
+              href="#collapseTimeSpent"
+              class="nav-link link-body-emphasis"
+              data-bs-toggle="collapse"
+              role="button"
+              aria-expanded="false"
+              aria-controls="collapseTimeSpent"
+            >
+              Time Spent
+            </a>
+            <div class="collapse" id="collapseTimeSpent">
+              <div class="collapse-content">
+                <p>
+                  <span id="totalHours" class="specialnumber">0</span> Hours
+                  <span id="totalMinutes" class="specialnumber">0</span> Minutes
+                </p>
+              </div>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a
+              href="#collapseCompletedTasks"
+              class="nav-link link-body-emphasis"
+              data-bs-toggle="collapse"
+              role="button"
+              aria-expanded="false"
+              aria-controls="collapseCompletedTasks"
+            >
+              Completed Tasks
+            </a>
+            <div class="collapse" id="collapseCompletedTasks">
+              <div class="collapse-content">
+                <p>
+                  <span id="completedTasksCount" class="specialnumber">0</span>
+                  Tasks
+                </p>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="content">
+        <div class="hero-section">
+          <h1>Welcome, {{ username }}!</h1>
+          <p>Manage your tasks efficiently.</p>
+          <button
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#taskModal"
+          >
+            Create a New Task
+          </button>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <a
+          href="#"
+          class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none"
+        >
+          <span class="fs-4">Pending Tasks</span>
+        </a>
+        <hr />
+        <ul class="nav nav-pills flex-column mb-auto" id="taskList"></ul>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="taskModal"
+      tabindex="-1"
+      aria-labelledby="taskModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="taskModalLabel">Create New Task</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="taskForm">
+              <div class="mb-3">
+                <label for="taskName" class="form-label">Task Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="taskName"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="taskDescription" class="form-label"
+                  >Description</label
+                >
+                <textarea
+                  class="form-control"
+                  id="taskDescription"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="taskDeadline" class="form-label">Deadline</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="taskDeadline"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">Add Task</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const userId = "{{ user_email }}";
+
+        function fetchTimeSpent() {
+          fetch(`/get_time_spent/${userId}`)
+            .then((response) => response.json())
+            .then((data) => {
+              const totalMinutes = data.time_spent || 0;
+              const totalHours = Math.floor(totalMinutes / 60);
+              const remainingMinutes = totalMinutes % 60;
+
+              document.getElementById("totalHours").textContent = totalHours;
+              document.getElementById("totalMinutes").textContent =
+                remainingMinutes;
+            })
+            .catch((error) =>
+              console.error("Error fetching time spent:", error)
+            );
+        }
+
+        function updateTimeSpent() {
+          let startTime = Date.now();
+
+          setInterval(() => {
+            let now = Date.now();
+            let elapsedTime = now - startTime;
+            let totalMinutes = Math.floor(elapsedTime / (1000 * 60));
+
+            fetch("/update_time_spent", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                user_id: userId,
+                time_spent: totalMinutes,
+              }),
+            })
+              .then(() => {
+                startTime = Date.now();
+              })
+              .catch((error) =>
+                console.error("Error updating time spent:", error)
+              );
+          }, 60 * 1000);
+        }
+
+        function getTasks() {
+          fetch(`/get_tasks/${userId}`)
+            .then((response) => response.json())
+            .then((data) => {
+              const tasks = data.tasks || [];
+              const taskList = document.getElementById("taskList");
+              taskList.innerHTML = "";
+
+              tasks.forEach((task, index) => {
+                const taskHtml = `
+            <li class="nav-item">
+              <a href="#task${index}" class="nav-link link-body-emphasis" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="task${index} data-task-id="${
+                  task._id
+                }" >
+                ${task.title}
+              </a>
+              <div class="collapse" id="task${index}">
+                <div class="collapse-content">
+                  <p>Description: ${task.description}</p>
+                  <p>Deadline: ${new Date(
+                    task.deadline
+                  ).toLocaleDateString()}</p>
+                  <button class="btn btn-success btn-sm mark-completed-btn" data-task-id="${
+                    task._id
+                  }" style="margin-right:20px"><i class="bi bi-check2-circle"></i></button>
+                  <button class="btn btn-danger btn-sm delete-task-btn" data-task-id="${
+                    task._id
+                  }"><i class="bi bi-trash3"></i></button>
+                </div>
+              </div>
+            </li>
+          `;
+                taskList.insertAdjacentHTML("beforeend", taskHtml);
+              });
+              document
+                .querySelectorAll(".mark-completed-btn")
+                .forEach((button) => {
+                  button.addEventListener("click", function () {
+                    const taskId = document
+                      .querySelector(".mark-completed-btn")
+                      .getAttribute("data-task-id");
+                    markAsCompleted(taskId);
+                  });
+                });
+
+              document
+                .querySelectorAll(".delete-task-btn")
+                .forEach((button) => {
+                  button.addEventListener("click", function () {
+                    const taskId = document
+                      .querySelector(".delete-task-btn")
+                      .getAttribute("data-task-id");
+                    if (confirm("Are You Sure To Delete This Comment?")) {
+                      deleteTask(taskId);
+                    }
+                  });
+                });
+            })
+            .catch((error) => console.error("Error fetching tasks:", error));
+        }
+        function markAsCompleted(taskId) {
+          fetch(`/mark_as_completed/${taskId}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              task_id: taskId,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                getTasks();
+                updateCompletedCount();
+              }
+            })
+            .catch((error) =>
+              console.error("Error marking task as completed:", error)
+            );
+        }
+
+        function deleteTask(taskId) {
+          fetch(`/delete_task/${taskId}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                location.reload();
+              }
+            })
+            .catch((error) => console.error("Error deleting task:", error));
+        }
+
+        function updateCompletedCount() {
+          fetch(`/get_completed_tasks_count/${userId}`)
+            .then((response) => response.json())
+            .then((data) => {
+              const completedCount = data.completed_count;
+              document.getElementById("completedTasksCount").textContent =
+                completedCount;
+            })
+            .catch((error) =>
+              console.error("Error fetching completed tasks count:", error)
+            );
+        }
+
+        function fetchCompletedCountOnLoad() {
+          updateCompletedCount();
+        }
+
+        document
+          .getElementById("taskForm")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const taskName = document.getElementById("taskName").value;
+            const taskDescription =
+              document.getElementById("taskDescription").value;
+            const taskDeadline = document.getElementById("taskDeadline").value;
+
+            fetch("/create_task", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                user_id: userId,
+                task_name: taskName,
+                task_description: taskDescription,
+                task_deadline: taskDeadline,
+                created_at: new Date(),
+              }),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                updateCompletedCount();
+                location.reload();
+              })
+              .catch((error) => console.error("Error creating task:", error));
+          });
+
+        getTasks();
+        fetchTimeSpent();
+        updateTimeSpent();
+        fetchCompletedCountOnLoad();
+      });
+    </script>
+  </body>
+</html>

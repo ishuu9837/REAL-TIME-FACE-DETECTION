@@ -1,0 +1,33 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+.content {
+  flex: 1;
+}
+.login-container {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to right, #d7cdff, #b1a3e8);
+}
+.login-container img {
+  display: block;
+  margin: 0 auto 20px;
+}
+.login-container .form-check-label {
+  font-size: 0.875rem;
+}
+.login-container button {
+  margin-top: 20px;
+}
+#cameraCanvas {
+  width: 100%;
+  height: auto;
+  display: none;
+  border: 1px solid #ced4da;
+  margin-top: 15px;
+}

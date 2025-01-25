@@ -1,0 +1,72 @@
+.signup-container {
+    max-width: 500px;
+    margin: 50px auto;
+    width: 100%;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(to right, #d7cdff, #b1a3e8);
+  }
+  .signup-container img {
+    display: block;
+    margin: 0 auto 20px;
+  }
+  .signup-container .form-check-label {
+    font-size: 0.875rem;
+  }
+  .signup-container button {
+    margin-top: 20px;
+  }
+  .custom-file-button {
+    display: flex;
+    align-items: center;
+  }
+  .custom-file-button input[type="file"] {
+    display: none;
+  }
+  .custom-file-button .btn {
+    margin-left: 10px;
+  }
+  .iti {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+  }
+  .iti .intl-tel-input {
+    padding: 150px;
+    border-radius: 0.375rem;
+    border: 1px solid #ced4da;
+  }
+  #cameraCanvas {
+    width: 100%;
+    height: auto;
+    display: none;
+    border: 1px solid #ced4da;
+    margin-top: 15px;
+    position: relative;
+  }
+  #captureButton {
+    margin-top: 20px;
+    margin-left: 10px;
+  }
+  #continueButton {
+    margin-top: 20px;
+    margin-left: 10px;
+  }
+  #capturedImage {
+    width: 100%;
+    margin-top: 15px;
+    display: none;
+    border: 1px solid #ced4da;
+  }
+  #cameraModal .modal-body {
+    position: relative;
+    padding: 0;
+  }
+  #cameraCanvasContainer {
+    padding: 20px;
+    position: relative;
+  }
+  .hidden {
+    display: none;
+  }
